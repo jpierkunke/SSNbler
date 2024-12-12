@@ -317,6 +317,7 @@ lines_to_lsn <- function(streams, lsn_path,
     ## Print message
     if (verbose == TRUE) message("Checking network topology\n")
 
+    ##browser()
     ##### SLOW VERSION WITHOUT ERROR
     # Find distances between nodes and the edge to/from end nodes.
     # Returns rectangular distance matrix between nodes (rows)
@@ -417,7 +418,8 @@ lines_to_lsn <- function(streams, lsn_path,
     ## Find edge intersections without nodes
     sf::st_agr(in_edges) <- "constant"
     intersections <- st_intersection(in_edges, in_edges)
-    points_only <- subset(intersections, st_geometry_type(intersections) == "POINT")
+    points_only <- subset(intersections,
+                          st_geometry_type(intersections) == "POINT")
 
     ## Want all_nodes as single here because looking for edge intersections
     int_vs_nodes <- st_intersects(points_only, all_nodes_as_single)
