@@ -317,7 +317,6 @@ lines_to_lsn <- function(streams, lsn_path,
     ## Print message
     if (verbose == TRUE) message("Checking network topology\n")
 
-    ##browser()
     ##### SLOW VERSION WITHOUT ERROR
     # Find distances between nodes and the edge to/from end nodes.
     # Returns rectangular distance matrix between nodes (rows)
