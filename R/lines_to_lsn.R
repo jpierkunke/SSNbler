@@ -584,26 +584,18 @@ lines_to_lsn <- function(streams, lsn_path,
 
   ## Final message
   if (verbose == TRUE) {
-    if (nrow(errors) == 0) {
-      message(paste0(
-        "\n0 topology errors identified. node_errors.gpkg not written to file.\n\n",
-        n.outlets,
-        " Outlets found. Visually check nodecat == Outlet locations in ",
-        lsn_path, "/nodes.gpkg and correct errors if found.\n"
-      ))
+    if(check_topology == TRUE){
+      if (nrow(errors) == 0) {
+        message(paste0(
+          "\n0 topology errors identified. node_errors.gpkg not written to file.\n\n",
+          n.outlets,
+          " Outlets found. Visually check nodecat == Outlet locations in ",
+          lsn_path, "/nodes.gpkg and correct errors if found.\n"
+        ))
+      }
     } else {
-      message(paste0(
-        "\n", nrow(errors),
-        " topology errors identified. Check ",
-        lsn_path,
-        "/node_errors.gpkg and correct errors in edges.gpkg before re-running lines_to_lsn().\n\n",
-        n.outlets,
-        " Outlets found. Visually check nodecat == Outlet locations in ",
-        lsn_path,
-        "/nodes.gpkg and correct errors if found.\n"
-      ))
+        message("LSN created. Topology not checked.")
     }
-  }
-
+  } 
   return(in_edges)
 }
