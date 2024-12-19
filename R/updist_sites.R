@@ -174,14 +174,16 @@ updist_sites <- function(sites, edges, length_col, lsn_path, save_local = TRUE,
     ## Check if upDist column already exists and overwrite is FALSE
     ## If so, skip this iteration in the loop
     if ("upDist" %in% names(sites_i_sf) & !overwrite) {
-      message(
-        "A column called 'upDist' already exists in ", sites_i_name,
-        " and overwrite is set to FALSE. This set of sites will be skipped."
-      )
+      
       if(length(n_sites) > 1){
+          message(
+            "A column called 'upDist' already exists in ", sites_i_name,
+            " and overwrite is set to FALSE. This set of sites will be skipped."
+          )
           next
       } else {
-          return(NULL)
+          stop(paste0("A column called 'upDist' already exists in ", sites_i_name,
+               " and overwrite is set to FALSE."))
       }
     }
     
