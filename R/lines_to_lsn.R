@@ -27,6 +27,8 @@
 #'   overwrite existing files with the same names. If \code{FALSE} and
 #'   files sharing the same names as the outputs exist in the
 #'   \code{lsn_path}, the function will exit early with an error.
+#' @param no_cores Integer representing the number of cores used when \code{use_parallel = TRUE}.
+#' @param use_parallel Logical. if \code{TRUE} parallel processing will be used. Default is \code{FALSE}.
 #' @param verbose Logical. If \code{TRUE}, messages describing
 #'   function progress will be printed to the console. Default is
 #'   \code{TRUE}.
@@ -94,6 +96,8 @@ lines_to_lsn <- function(streams, lsn_path,
                          topo_tolerance = 0,
                          remove_ZM = FALSE,
                          overwrite = FALSE,
+												 use_parallel = FALSE,
+												 no_cores = NULL,
                          verbose = TRUE) {
   # check sf object
   if (!inherits(streams, "sf")) {
@@ -171,6 +175,17 @@ lines_to_lsn <- function(streams, lsn_path,
     }
   }
   check_names_case(names(in_edges), "rid", "streams")
+  
+  # check that no_cores is set if use_parallel = TRUE
+  if(use_parallel == TRUE & is.null(no_cores)){
+  	stop("Argument no_cores must be set if use_parallel = TRUE")
+  }
+  
+  if(!is.null(no_cores) & use_parallel == TRUE){
+  	if(detectCores() < no_cores) {
+  		stop(paste0("no_cores > number of cores on your computer"))
+  	}
+  }
 
   ## If fid file exists and overwrite is TRUE
   if ("fid" %in% colnames(in_edges)) {
@@ -212,8 +227,6 @@ lines_to_lsn <- function(streams, lsn_path,
 
   if (verbose == TRUE) message("Building Edge Relationships ...\n")
 
-
-
   ##### SLOW VERSION WITHOUT ERROR
   ## First and last point of each last segment, stored as an SF object
   ## from_point <- st_line_sample(st_transform(in_edges, epsg), sample = 0)
@@ -221,27 +234,37 @@ lines_to_lsn <- function(streams, lsn_path,
   to_point <- st_line_sample(in_edges, sample = 1)
   from_xy <- do.call(rbind, lapply(from_point, function(x) x[1:2]))
   to_xy <- do.call(rbind, lapply(to_point, function(x) x[1:2]))
-
-  ## Find the distance between the from_xy of each line segment and
-  ## the to_xy of every line segment. from in the rows, tos in the columns
-  node_dist <- pdist(from_xy, to_xy)
-
-  ## convert to matrix for easier searching. row/column elements
-  ## labelled by rid
-  dist_matrix <- as.matrix(node_dist)
-  colnames(dist_matrix) <- rownames(dist_matrix) <- in_edges$rid
-
-  ## Returns a list == length(edges) with dist_matrix names containing
-  ## the rid value for other flow-connected edges connecting to the
-  ## same node. Does not capture flow-unconnected
-  rid_confl <- apply(dist_matrix, 2, function(x) which(x <= snap_tolerance))
-
+  
   ##### FAST VERSION WITH ERROR
   # from_point <- st_line_sample(in_edges, sample = 0)
   # to_point <- st_line_sample(in_edges, sample = 1)
   # rid_confl <- get_rid_confl(from_point, to_point, snap_tolerance)
   # # each element does not have names on the vector here, but they do for previous
   # names(rid_confl) <- in_edges$rid
+
+  rownames(to_xy)<- in_edges$rid
+  rownames(from_xy)<- in_edges$rid
+  
+  if(use_parallel == FALSE) {
+  	## Find the distance between the from_xy of each line segment and
+  	## the to_xy of every line segment. from in the rows, tos in the columns
+  	node_dist <- pdist(from_xy, to_xy)
+
+  	## convert to matrix for easier searching. row/column elements
+  	## labelled by rid
+  	dist_matrix <- as.matrix(node_dist)
+  	colnames(dist_matrix) <- rownames(dist_matrix) <- in_edges$rid
+
+  	## Returns a list == length(edges) with dist_matrix names containing
+  	## the rid value for other flow-connected edges connecting to the
+  	## same node. Does not capture flow-unconnected
+  	rid_confl <- apply(dist_matrix, 2, function(x) which(x <= snap_tolerance))
+  	
+	} else {
+		
+		rid_confl <- get_big_dist(from_xy, to_xy, no_cores, snap_tolerance)
+	
+	}
 
   ## Find all outlet edges -- these are just edges that do not flow into another edge
   ## Returns a vector of TRUE/FALSE
@@ -588,9 +611,17 @@ lines_to_lsn <- function(streams, lsn_path,
         message(paste0(
           "\n0 topology errors identified. node_errors.gpkg not written to file.\n\n",
           n.outlets,
-          " Outlets found. Visually check nodecat == Outlet locations in ",
+          " outlets found. Visually check nodecat == Outlet locations in ",
           lsn_path, "/nodes.gpkg and correct errors if found.\n"
         ))
+      } else {
+      	message(paste0("\n", nrow(errors),
+      		" topology errors identified. node_errors.gpkg written to ", 
+      		lsn_path, "/node_errors.gpkg. Correct errors before re-running lines_to_lsn().\n\n",
+      		n.outlets,
+      		" outlets found. Visually check nodecat == Outlet locations in ",
+      		lsn_path, "/nodes.gpkg and correct errors if found.\n"
+      	))
       }
     } else {
         message("LSN created. Topology not checked.")

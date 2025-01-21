@@ -12,6 +12,8 @@ lines_to_lsn(
   topo_tolerance = 0,
   remove_ZM = FALSE,
   overwrite = FALSE,
+  use_parallel = FALSE,
+  no_cores = NULL,
   verbose = TRUE
 )
 }
@@ -45,6 +47,10 @@ removed from streams, if they exist. Default is \code{FALSE}.}
 overwrite existing files with the same names. If \code{FALSE} and
 files sharing the same names as the outputs exist in the
 \code{lsn_path}, the function will exit early with an error.}
+
+\item{use_parallel}{Logical. if \code{TRUE} parallel processing will be used. Default is \code{FALSE}.}
+
+\item{no_cores}{Integer representing the number of cores used when \code{use_parallel = TRUE}.}
 
 \item{verbose}{Logical. If \code{TRUE}, messages describing
 function progress will be printed to the console. Default is

@@ -42,7 +42,9 @@ Imports:
 	igraph,
 	RSQLite,
 	withr,
-	SSN2
+	SSN2,
+	doParallel,
+	foreach
 Suggests:
     ggplot2,
     knitr,

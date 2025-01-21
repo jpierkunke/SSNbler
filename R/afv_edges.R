@@ -119,10 +119,13 @@
 #'
 afv_edges <- function(edges, lsn_path, infl_col, segpi_col, afv_col,
                       save_local = TRUE, overwrite = TRUE) {
+  
   # check sf object
   if (!inherits(edges, "sf")) {
     stop("edges must be an sf object.", call. = FALSE)
   }
+  
+  
 
   ## Check inputs -------------------------------------------------
   ## Check geometry type
@@ -189,6 +192,7 @@ afv_edges <- function(edges, lsn_path, infl_col, segpi_col, afv_col,
   check_names_case(names(edges), "fid", "edges")
 
 
+  
   ## Check infl_col column
   if (!infl_col %in% colnames(edges)) {
     stop(paste0(infl_col, " not found in edges"))
