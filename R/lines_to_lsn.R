@@ -227,48 +227,52 @@ lines_to_lsn <- function(streams, lsn_path,
 
   if (verbose == TRUE) message("Building Edge Relationships ...\n")
 
-  ##### SLOW VERSION WITHOUT ERROR
+  # ##### SLOW VERSION WITHOUT ERROR
   ## First and last point of each last segment, stored as an SF object
   ## from_point <- st_line_sample(st_transform(in_edges, epsg), sample = 0)
-  from_point <- st_line_sample(in_edges, sample = 0)
-  to_point <- st_line_sample(in_edges, sample = 1)
-  from_xy <- do.call(rbind, lapply(from_point, function(x) x[1:2]))
-  to_xy <- do.call(rbind, lapply(to_point, function(x) x[1:2]))
-  
-  ##### FAST VERSION WITH ERROR
   # from_point <- st_line_sample(in_edges, sample = 0)
   # to_point <- st_line_sample(in_edges, sample = 1)
-  # rid_confl <- get_rid_confl(from_point, to_point, snap_tolerance)
-  # # each element does not have names on the vector here, but they do for previous
-  # names(rid_confl) <- in_edges$rid
+  # from_xy <- do.call(rbind, lapply(from_point, function(x) x[1:2]))
+  # to_xy <- do.call(rbind, lapply(to_point, function(x) x[1:2]))
+  # 
+  # ##### FAST VERSION WITH ERROR
+  # # from_point <- st_line_sample(in_edges, sample = 0)
+  # # to_point <- st_line_sample(in_edges, sample = 1)
+  # # rid_confl <- get_rid_confl(from_point, to_point, snap_tolerance)
+  # # # each element does not have names on the vector here, but they do for previous
+  # # names(rid_confl) <- in_edges$rid
 
-  rownames(to_xy)<- in_edges$rid
-  rownames(from_xy)<- in_edges$rid
-  
-  if(use_parallel == FALSE) {
-  	## Find the distance between the from_xy of each line segment and
-  	## the to_xy of every line segment. from in the rows, tos in the columns
-  	node_dist <- pdist(from_xy, to_xy)
+  # rownames(to_xy)<- in_edges$rid
+  # rownames(from_xy)<- in_edges$rid
 
-  	## convert to matrix for easier searching. row/column elements
-  	## labelled by rid
-  	dist_matrix <- as.matrix(node_dist)
-  	colnames(dist_matrix) <- rownames(dist_matrix) <- in_edges$rid
-
-  	## Returns a list == length(edges) with dist_matrix names containing
-  	## the rid value for other flow-connected edges connecting to the
-  	## same node. Does not capture flow-unconnected
-  	rid_confl <- apply(dist_matrix, 2, function(x) which(x <= snap_tolerance))
-  	
-	} else {
-		
-		rid_confl <- get_big_dist(from_xy, to_xy, no_cores, snap_tolerance)
-	
-	}
+#   if(use_parallel == FALSE) {
+#   	## Find the distance between the from_xy of each line segment and
+#   	## the to_xy of every line segment. from in the rows, tos in the columns
+#   	node_dist <- pdist(from_xy, to_xy)
+# 
+#   	## convert to matrix for easier searching. row/column elements
+#   	## labelled by rid
+#   	dist_matrix <- as.matrix(node_dist)
+#   	colnames(dist_matrix) <- rownames(dist_matrix) <- in_edges$rid
+# 
+#   	## Returns a list == length(edges) with dist_matrix names containing
+#   	## the rid value for other flow-connected edges connecting to the
+#   	## same node. Does not capture flow-unconnected
+#   	rid_confl <- apply(dist_matrix, 2, function(x) which(x <= snap_tolerance))
+#   	
+# 	} else {
+# 		
+# 		rid_confl <- get_big_dist2(from_xy = from_xy, 
+# 															 to_xy = to_xy, 
+# 															 ncores = no_cores, 
+# 															 snap_tolerance = snap_tolerance,
+# 															 type = "which")
+# 	
+# 	}
 
   ## Find all outlet edges -- these are just edges that do not flow into another edge
   ## Returns a vector of TRUE/FALSE
-  outlets <- unlist(lapply(rid_confl, function(x) length(x) == 0)) ## logical vector
+  ##outlets <- unlist(lapply(rid_confl, function(x) length(x) == 0)) ## logical vector
 
   ## message("\n\nCreating nodes....\n")
 
@@ -334,47 +338,118 @@ lines_to_lsn <- function(streams, lsn_path,
     crs = lst_crs,
     sf_column_name = edge.geom.name
   )
+  
+  ##############################################################
+  ## get big dist matrix - one call
+  ##############################################################
+  
+  ##### May be able to combine creation of next four with, 
+  ## all_nodes, all_nodes_single, to_from_coords
+  
+  ## First and last point of each last segment, stored as an SF object
+  ## from_point <- st_line_sample(st_transform(in_edges, epsg), sample = 0)
+  from_point <- st_line_sample(in_edges, sample = 0)
+  to_point <- st_line_sample(in_edges, sample = 1)
+  from_xy <- do.call(rbind, lapply(from_point, function(x) x[1:2]))
+  to_xy <- do.call(rbind, lapply(to_point, function(x) x[1:2]))
+  
+  rownames(to_xy)<- in_edges$rid
+  rownames(from_xy)<- in_edges$rid
+  
+  if(use_parallel == FALSE) {
+    	## Find the distance between the from_xy of each line segment and
+    	## the to_xy of every line segment. from in the rows, tos in the columns
+    	node_dist <- pdist(from_xy, to_xy)
+
+    	## convert to matrix for easier searching. row/column elements
+    	## labelled by rid
+    	dist_matrix <- as.matrix(node_dist)
+    	colnames(dist_matrix) <- rownames(dist_matrix) <- in_edges$rid
+
+    	## Returns a list == length(edges) with dist_matrix names containing
+    	## the rid value for other flow-connected edges connecting to the
+    	## same node. Does not capture flow-unconnected
+    	rid_confl <- apply(dist_matrix, 2, function(x) which(x <= snap_tolerance))
+
+  } else {
+  		rid_confl <- get_pdist_rid(from_xy = from_xy,
+  															 to_xy = to_xy,
+  															 ncores = no_cores,
+  															 snap_tolerance = snap_tolerance)
+  }
+  
+  ## Find all outlet edges -- these are just edges that do not flow into another edge
+  ## Returns a vector of TRUE/FALSE
+  outlets <- unlist(lapply(rid_confl, function(x) length(x) == 0)) ## logical vector
+  
+  ##############################################################
 
   ## Check topology at this step, if it's been asked for
     if (check_topology) {
-    ## Print message
-    if (verbose == TRUE) message("Checking network topology\n")
+    	## Print message
+    	if (verbose == TRUE) message("Checking network topology\n")
+    	
+    	##### SLOW VERSION WITHOUT ERROR
+    	# Find distances between nodes and the edge to/from end nodes.
+    	# Returns rectangular distance matrix between nodes (rows)
+    	# and edge end nodes (columns)
+    	# from_xy <- do.call(rbind, lapply(from_point, function(x) x[1:2]))
+    	# to_xy <- do.call(rbind, lapply(to_point, function(x) x[1:2]))
+    
+    	# nodes_vs_from1 <- as.matrix(pdist(node_coords, from_xy))
+    	# nodes_vs_to1 <- as.matrix(pdist(node_coords, to_xy))
+  
+    	##############################################################  	
+    	if(use_parallel == FALSE){
+    		nodes_vs_from <- as.matrix(pdist(node_coords, from_xy))
+    		nodes_vs_to <- as.matrix(pdist(node_coords, to_xy))
+    		
+    		# Summarise the number of node-edge intersections based on this distance matrix
+    		# Returns a vector with length==nrow(node_coords) containing number of line
+    		# segments flowing in/out
+    		n_inflow <- apply(nodes_vs_to, 1, function(x) {
+    			sum(x <= snap_tolerance)
+    		})
+    		n_outflow <- apply(nodes_vs_from, 1, function(x) {
+    			sum(x <= snap_tolerance)
+    		})
+    		
+    		## Find any unsnapped intersections for line endpoints and line
+    		## start points based on snap_tolerance. Apply to each row. Value
+    		## of 0 means already at same location
+    		snap_check_1 <- apply(nodes_vs_to, 1, function(x) {
+    			sum(x > 0 & x <= snap_tolerance)
+    		})
+    		snap_check_2 <- apply(nodes_vs_from, 1, function(x) {
+    			sum(x > 0 & x <= snap_tolerance)
+    		})
+    		
+    	} else {
 
-    ##### SLOW VERSION WITHOUT ERROR
-    # Find distances between nodes and the edge to/from end nodes.
-    # Returns rectangular distance matrix between nodes (rows)
-    # and edge end nodes (columns)
-    from_xy <- do.call(rbind, lapply(from_point, function(x) x[1:2]))
-    to_xy <- do.call(rbind, lapply(to_point, function(x) x[1:2]))
-    nodes_vs_from <- as.matrix(pdist(node_coords, from_xy))
-    nodes_vs_to <- as.matrix(pdist(node_coords, to_xy))
+    		## Return a list with n_inflow, snap_check_1
+    		## Old nodes_vs_to
+    		in.list<- get_pdist_nodes(node_xy = node_coords, 
+    															other_xy = to_xy, 
+    															ncores = no_cores, 
+    															snap_tolerance = snap_tolerance)
 
-    ## Summarise the number of node-edge intersections based on this distance matrix
-    ## Returns a vector with length==nrow(node_coords) containing number of line
-    ## segments flowing in/out
-    n_inflow <- apply(nodes_vs_to, 1, function(x) {
-      sum(x <= snap_tolerance)
-    })
-    n_outflow <- apply(nodes_vs_from, 1, function(x) {
-      sum(x <= snap_tolerance)
-    })
-
-    ## Find any unsnapped intersections for line endpoints and line
-    ## start points based on snap_tolerance. Apply to each row. Value
-    ## of 0 means already at same location
-    snap_check_1 <- apply(nodes_vs_to, 1, function(x) {
-      sum(x > 0 & x <= snap_tolerance)
-    })
-    snap_check_2 <- apply(nodes_vs_from, 1, function(x) {
-      sum(x > 0 & x <= snap_tolerance)
-    })
+    		n_inflow <- in.list[[1]]
+    		snap_check_1 <- in.list[[2]]
+    		
+    		rm(in.list)
+    		
+    		out.list<- get_pdist_nodes(node_xy = node_coords, 
+    															other_xy = from_xy, 
+    															ncores = no_cores, 
+    															snap_tolerance = snap_tolerance)
+    		n_outflow <- out.list[[1]]
+    		snap_check_2 <- out.list[[2]]
+    		
+    		rm(out.list)
+    		
+    	}
+   	
     unsnapped_connection <- (snap_check_1 + snap_check_2) > 0
-
-    ##### FAST VERSION WITH ERROR
-    # node_info <- get_node_info(node_coords, from_point, to_point, snap_tolerance)
-    # n_inflow <- unlist(lapply(node_info, function(x) x$n_inflow))
-    # n_outflow <- unlist(lapply(node_info, function(x) x$n_outflow))
-    # unsnapped_connection <- unlist(lapply(node_info, function(x) x$unsnapped_connection))
 
     ## Categorise nodes based on the number of inflow/outflow edges
     ## Returns a vector with T/F length = nrow(node_coords)

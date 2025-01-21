@@ -1,5 +1,5 @@
 
-pdist_par <- function(to_xy, from_xy, snap_tolerance = NULL) {
+pdist_rid_confl <- function(to_xy, from_xy, snap_tolerance = NULL) {
 	
 	node_dist <- pdist(from_xy, to_xy)
 	
