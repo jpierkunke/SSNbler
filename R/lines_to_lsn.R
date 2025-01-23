@@ -339,13 +339,6 @@ lines_to_lsn <- function(streams, lsn_path,
     sf_column_name = edge.geom.name
   )
   
-  ##############################################################
-  ## get big dist matrix - one call
-  ##############################################################
-  
-  ##### May be able to combine creation of next four with, 
-  ## all_nodes, all_nodes_single, to_from_coords
-  
   ## First and last point of each last segment, stored as an SF object
   ## from_point <- st_line_sample(st_transform(in_edges, epsg), sample = 0)
   from_point <- st_line_sample(in_edges, sample = 0)
@@ -448,7 +441,7 @@ lines_to_lsn <- function(streams, lsn_path,
     		rm(out.list)
     		
     	}
-   	
+
     unsnapped_connection <- (snap_check_1 + snap_check_2) > 0
 
     ## Categorise nodes based on the number of inflow/outflow edges
@@ -484,7 +477,9 @@ lines_to_lsn <- function(streams, lsn_path,
     buffer_ids <- unlist(buffer_ids)
 
     crossings <- table(buffer_ids)
-    hanging_nodes <- unname(which(crossings > 1))
+    
+    hanging_nodes <- as.numeric(names(crossings)[which(crossings > 1)])
+    #hanging_nodes <- unname(which(crossings > 1)) ## error happening here
 
     ## Subset by node error, add an error column, combine at end
     unsnapped <- nodexy_sf[unsnapped_connection, ]
