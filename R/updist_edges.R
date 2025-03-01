@@ -185,6 +185,11 @@ updist_edges <- function(edges, lsn_path = NULL, calc_length = FALSE, length_col
   ## Import relationship table
   if (verbose == TRUE) message("\n\nImporting relationships.csv table")
   rel <- read.csv(relate_table)
+  
+  ## Check for downstream divergences
+  if(sum(duplicated(rel$fromedge)) > 0) {
+  	stop("At least one downstream divergence is present in edges. Fix topology errors and re-create error free edges using lines_to_lsn().")
+  }
 
   ## Get vector of rid values for outlet segment(s)
   if (verbose == TRUE) message("\nIdentifying outlet segments\n")

@@ -446,13 +446,13 @@ lines_to_lsn <- function(streams, lsn_path,
 
     ## Categorise nodes based on the number of inflow/outflow edges
     ## Returns a vector with T/F length = nrow(node_coords)
-    outlet_nodes <- (n_inflow == 1 & n_outflow == 0)
-    headwaters <- (n_inflow == 0 & n_outflow == 1)
-    confluences <- (n_inflow == 2 & n_outflow == 1)
+    outlet_nodes <- (n_inflow >= 1 & n_outflow == 0)
+    headwaters <- (n_inflow == 0 & n_outflow >= 1)
+    confluences <- (n_inflow >= 2 & n_outflow >= 1)
     pseudo_node <- (n_inflow == 1 & n_outflow == 1)
 
     ## Identify errors
-    complex_confluences <- n_inflow > 2 & n_outflow == 1
+    complex_confluences <- n_inflow >= 3 & n_outflow >=0
     converging_nodes <- n_inflow == 2 & n_outflow == 0
     downstream_divergence <- n_outflow > 1
 
@@ -466,9 +466,7 @@ lines_to_lsn <- function(streams, lsn_path,
     nodexy_sf$nodecat[downstream_divergence] <- "Confluence"
     nodexy_sf$nodecat[converging_nodes] <- "Outlet"
 
-    ## Find dangling edges -- these are another kind of unsnapped connection
-    ## Figure this out when using data with topo errors
-    ## outlets_only <- filter(nodexy_sf, nodecat == "Outlet")
+    ## Find dangling edges: these are another kind of unsnapped connection
     outlets_only <- subset(nodexy_sf, nodecat == "Outlet")
     buff_outlets <- st_buffer(outlets_only, topo_tolerance)
     buff_cross <- st_crosses(in_edges, buff_outlets)
