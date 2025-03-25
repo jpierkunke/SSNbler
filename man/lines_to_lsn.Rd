@@ -118,5 +118,5 @@ are automatically snapped when \code{check_topology = TRUE}.  When
 (snap_tolerance/10000) <= distance <= snap_tolerance, the nodes are
 not snapped and are instead flagged as potential errors for the
 user to check and correct. Similarly, when snap_tolerance < distance <=
-topo_tolerance, nodes are flagged as potential errors.
+topo_tolerance, nodes are flagged as potential errors. Note that \code{snap_tolerance} must always be < the length of the shortest line feature found in \code{streams}. Use the \code{\link[sf]{st_length}} to obtain and check the length of each line feature.
 }

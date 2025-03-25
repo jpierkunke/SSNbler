@@ -84,13 +84,14 @@
 #' (snap_tolerance/10000) <= distance <= snap_tolerance, the nodes are
 #' not snapped and are instead flagged as potential errors for the
 #' user to check and correct. Similarly, when snap_tolerance < distance <=
-#' topo_tolerance, nodes are flagged as potential errors.
+#' topo_tolerance, nodes are flagged as potential errors. Note that \code{snap_tolerance} must always be < the length of the shortest line feature found in \code{streams}. Use the \code{\link[sf]{st_length}} to obtain and check the length of each line feature. 
 #'
 #' @return An `sf` object representing edges in the LSN. The LSN, including edges.gpkg, nodes.gpkg, nodexy.csv, noderelationships.csv, and relationships.csv files, are saved locally to a directory defined by \code{lsn_path}. If \code{check_topology = TRUE} and topological errors are identified, then node_errors.gpkg is also saved to \code{lsn_path}.
 #'
 #' @export
 #'
-lines_to_lsn <- function(streams, lsn_path,
+lines_to_lsn <- function(streams, 
+												 lsn_path,
                          check_topology = TRUE,
                          snap_tolerance = 0,
                          topo_tolerance = 0,
@@ -161,6 +162,16 @@ lines_to_lsn <- function(streams, lsn_path,
   if (snap_tolerance < 0 | topo_tolerance < 0) {
     stop("snap_tolerance and topo_tolerance must be >= 0")
   }
+  
+  ## Check that snap_tolerance > length of shortest line
+  if(check_topology == TRUE & snap_tolerance > 0) {
+  	sm_edges<- sum(as.numeric(st_length(in_edges)) < snap_tolerance)
+  	
+  	if(sm_edges > 0) {
+  		stop("snap_tolerance must be > than the length of the smallest line feature in streams. Use sf::st_length() to obtain line feature lengths.")
+  	}
+  	
+  }
 
   if (inherits(in_edges, "sf")) n_edges <- nrow(in_edges)
   if (inherits(in_edges, "sfc")) n_edges <- length(in_edges)
@@ -226,55 +237,6 @@ lines_to_lsn <- function(streams, lsn_path,
   colnames(edge_relate) <- c("fromfeat", "tofeat")
 
   if (verbose == TRUE) message("Building Edge Relationships ...\n")
-
-  # ##### SLOW VERSION WITHOUT ERROR
-  ## First and last point of each last segment, stored as an SF object
-  ## from_point <- st_line_sample(st_transform(in_edges, epsg), sample = 0)
-  # from_point <- st_line_sample(in_edges, sample = 0)
-  # to_point <- st_line_sample(in_edges, sample = 1)
-  # from_xy <- do.call(rbind, lapply(from_point, function(x) x[1:2]))
-  # to_xy <- do.call(rbind, lapply(to_point, function(x) x[1:2]))
-  # 
-  # ##### FAST VERSION WITH ERROR
-  # # from_point <- st_line_sample(in_edges, sample = 0)
-  # # to_point <- st_line_sample(in_edges, sample = 1)
-  # # rid_confl <- get_rid_confl(from_point, to_point, snap_tolerance)
-  # # # each element does not have names on the vector here, but they do for previous
-  # # names(rid_confl) <- in_edges$rid
-
-  # rownames(to_xy)<- in_edges$rid
-  # rownames(from_xy)<- in_edges$rid
-
-#   if(use_parallel == FALSE) {
-#   	## Find the distance between the from_xy of each line segment and
-#   	## the to_xy of every line segment. from in the rows, tos in the columns
-#   	node_dist <- pdist(from_xy, to_xy)
-# 
-#   	## convert to matrix for easier searching. row/column elements
-#   	## labelled by rid
-#   	dist_matrix <- as.matrix(node_dist)
-#   	colnames(dist_matrix) <- rownames(dist_matrix) <- in_edges$rid
-# 
-#   	## Returns a list == length(edges) with dist_matrix names containing
-#   	## the rid value for other flow-connected edges connecting to the
-#   	## same node. Does not capture flow-unconnected
-#   	rid_confl <- apply(dist_matrix, 2, function(x) which(x <= snap_tolerance))
-#   	
-# 	} else {
-# 		
-# 		rid_confl <- get_big_dist2(from_xy = from_xy, 
-# 															 to_xy = to_xy, 
-# 															 ncores = no_cores, 
-# 															 snap_tolerance = snap_tolerance,
-# 															 type = "which")
-# 	
-# 	}
-
-  ## Find all outlet edges -- these are just edges that do not flow into another edge
-  ## Returns a vector of TRUE/FALSE
-  ##outlets <- unlist(lapply(rid_confl, function(x) length(x) == 0)) ## logical vector
-
-  ## message("\n\nCreating nodes....\n")
 
   ## Get sfc of edge end node coordinates
   all_nodes <- st_line_sample(in_edges, sample = c(0, 1))
@@ -371,6 +333,15 @@ lines_to_lsn <- function(streams, lsn_path,
   															 snap_tolerance = snap_tolerance)
   }
   
+  # # Identify line segments that are snapped to themselves
+  # sri <- which(mapply(function(name, values) as.numeric(name) %in% values, 
+  # 											 names(rid_confl), rid_confl))
+  # 
+  # # Remove the self-referencing ID from the corresponding list elements
+  # rid_confl[sri] <- lapply(sri, function(i) {
+  # 	rid_confl[[i]][rid_confl[[i]] != as.numeric(names(rid_confl)[i])]
+  # })
+  
   ## Find all outlet edges -- these are just edges that do not flow into another edge
   ## Returns a vector of TRUE/FALSE
   outlets <- unlist(lapply(rid_confl, function(x) length(x) == 0)) ## logical vector
@@ -381,18 +352,7 @@ lines_to_lsn <- function(streams, lsn_path,
     if (check_topology) {
     	## Print message
     	if (verbose == TRUE) message("Checking network topology\n")
-    	
-    	##### SLOW VERSION WITHOUT ERROR
-    	# Find distances between nodes and the edge to/from end nodes.
-    	# Returns rectangular distance matrix between nodes (rows)
-    	# and edge end nodes (columns)
-    	# from_xy <- do.call(rbind, lapply(from_point, function(x) x[1:2]))
-    	# to_xy <- do.call(rbind, lapply(to_point, function(x) x[1:2]))
-    
-    	# nodes_vs_from1 <- as.matrix(pdist(node_coords, from_xy))
-    	# nodes_vs_to1 <- as.matrix(pdist(node_coords, to_xy))
-  
-    	##############################################################  	
+	
     	if(use_parallel == FALSE){
     		nodes_vs_from <- as.matrix(pdist(node_coords, from_xy))
     		nodes_vs_to <- as.matrix(pdist(node_coords, to_xy))
@@ -527,7 +487,6 @@ lines_to_lsn <- function(streams, lsn_path,
       ill_int <-
         ill_int[, c("pointid", "nodecat", "error")]
     }
-
 
     ## Identify additional dangling nodes
     ## This is where it identifies the removed dangle node
