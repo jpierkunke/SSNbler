@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SSNbler</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
       </span>
     </div>
 
@@ -120,8 +120,8 @@ returned as an <code>SSN</code> object. Defaults to <code>TRUE</code>.</p></dd>
 
 
 <dt>afv_col</dt>
-<dd><p>Character vector containing the names of the
-additive function value columns that will be checked when
+<dd><p>Character vector containing the name(s) of the
+additive function value column(s) that will be checked when
 <code>check = TRUE</code>. Columns must be present in <code>edges</code>,
 <code>obs_sites</code> and <code>preds_list</code>, if all are
 included. Default is <code>NULL</code>.</p></dd>
@@ -135,7 +135,7 @@ overwritten. Defaults to <code>FALSE</code>.</p></dd>
 
 <dt>verbose</dt>
 <dd><p>Logical. Indicates whether messages about the
-function progress and object validity check (when <code>check = TRUE</code> should be printed to the console. Defaults to
+function progress and object validity check (when <code>check = TRUE</code>) should be printed to the console. Defaults to
 <code>TRUE</code>.</p></dd>
 
 </dl></div>
@@ -276,7 +276,7 @@ before the new directory is created. This directory contains:</p><ul><li><p>edge
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking inputs</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> C:\Users\mdumelle\AppData\Local\Temp\RtmpUFiNJq/example.ssn created.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> C:\Users\MDUMELLE\AppData\Local\Temp\RtmpIVjgt4/example.ssn created.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Creating binaryID.db</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Adding NetID and netgeom to edges </span>
@@ -287,7 +287,7 @@ before the new directory is created. This directory contains:</p><ul><li><p>edge
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> preds</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Saving files to C:\Users\mdumelle\AppData\Local\Temp\RtmpUFiNJq/example.ssn</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Saving files to C:\Users\MDUMELLE\AppData\Local\Temp\RtmpIVjgt4/example.ssn</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Creating SSN object</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
@@ -312,14 +312,14 @@ before the new directory is created. This directory contains:</p><ul><li><p>edge
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [6] "SLOPE"      "ELEV_DEM"   "Source"     "Summer_mn"  "MaxOver20" </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [11] "C16"        "C20"        "C24"        "FlowCMS"    "AirMEANc"  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [16] "AirMWMTc"   "rcaAreaKm2" "h2oAreaKm2" "ratio"      "snapdist"  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [21] "afvArea"    "upDist"     "locID"      "netID"      "geometry"  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [21] "afvArea"    "upDist"     "locID"      "netID"      "geom"      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [26] "netgeom"   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $preds</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1] "rid"        "pid"        "COMID"      "AREAWTMAP"  "SLOPE"     </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [6] "ELEV_DEM"   "FlowCMS"    "AirMEANc"   "AirMWMTc"   "rcaAreaKm2"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [11] "h2oAreaKm2" "ratio"      "snapdist"   "afvArea"    "upDist"    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [16] "locID"      "netID"      "geometry"   "netgeom"   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [16] "locID"      "netID"      "geom"       "netgeom"   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

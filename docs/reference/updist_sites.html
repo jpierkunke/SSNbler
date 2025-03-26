@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SSNbler</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
       </span>
     </div>
 
@@ -108,9 +108,8 @@ format. File basenames are taken from the names assigned to the
 
 <dt>overwrite</dt>
 <dd><p>A logical indicating whether results should be
-overwritten if the upDist column already exists in <code>sites</code>
-or sites.gpkg already exists in <code>lsn_path</code> and
-<code>save_local = TRUE</code>. Default = TRUE.</p>
+overwritten if the upDist or <code>length_col</code> columns already exist in <code>sites</code>
+or sites.gpkg already exists in <code>lsn_path</code>. Default = TRUE.</p>
 <p>#' @details <code>updist_sites()</code> calculates the total hydrologic distance from
 each observed or prediction point feature to
 the stream outlet (i.e. the most downstream location in the
@@ -123,7 +122,7 @@ new column named <code>upDist</code>.</p>
 calculate the pairwise hydrologic distances used to fit spatial
 stream network models in the 'SSN2' package. Do not modify the name
 of the column in any way or the values the <code>upDist</code> column
-contains.</p></dd>
+contains. If the <code>upDist</code> or <code>length_col</code> columns already exist in <code>sites</code> and <code>overwrite = TRUE</code>, the columns will be deleted from all <code>sites</code>.,</p></dd>
 
 </dl></div>
     <div id="value">
