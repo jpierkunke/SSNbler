@@ -3,7 +3,7 @@
 #' @param sites A named list of one or more `sf` objects with
 #'   POINT geometry that have been snapped to the LSN using
 #'   \code{\link[SSNbler]{sites_to_lsn}}.
-#' @param edges An `sf` object with LINESTING geometry created
+#' @param edges An `sf` object with LINESTRING geometry created
 #'   using \code{\link{lines_to_lsn}} and
 #'   \code{link[SSNbler]{updist_edges}}.
 #' @param length_col The name of the column in \code{edges} that

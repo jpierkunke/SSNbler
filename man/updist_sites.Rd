@@ -18,7 +18,7 @@ updist_sites(
 POINT geometry that have been snapped to the LSN using
 \code{\link[SSNbler]{sites_to_lsn}}.}
 
-\item{edges}{An \code{sf} object with LINESTING geometry created
+\item{edges}{An \code{sf} object with LINESTRING geometry created
 using \code{\link{lines_to_lsn}} and
 \code{link[SSNbler]{updist_edges}}.}
 

@@ -18,7 +18,7 @@ ssn_assemble(
 )
 }
 \arguments{
-\item{edges}{An \code{sf} object with LINESTING geometry created
+\item{edges}{An \code{sf} object with LINESTRING geometry created
 using \code{\link{lines_to_lsn}} (see Details).}
 
 \item{lsn_path}{Local pathname to a directory in character format

@@ -2,7 +2,7 @@
 #'
 #' @description Create an `SSN` (spatial stream network) object from a Landscape Network (LSN).
 #'
-#' @param edges An `sf` object with LINESTING geometry created
+#' @param edges An `sf` object with LINESTRING geometry created
 #'   using \code{\link{lines_to_lsn}} (see Details).
 #' @param lsn_path Local pathname to a directory in character format
 #'   specifying where relationships.csv resides, which is created

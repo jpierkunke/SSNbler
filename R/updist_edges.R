@@ -3,7 +3,7 @@
 #'   (i.e. the most downstream location on the stream network) to the
 #'   upstream node of each edge feature (i.e. upstream distance) in
 #'   the Landscape Network (LSN)
-#' @param edges An `sf` object with LINESTING geometry created
+#' @param edges An `sf` object with LINESTRING geometry created
 #'   using \code{\link{lines_to_lsn}}.
 #' @param lsn_path Local pathname to a directory in character format
 #'   specifying where relationships.csv resides, which is created

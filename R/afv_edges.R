@@ -1,7 +1,7 @@
 #' @title Calculate the additive function value for edges in a LSN
 #' @description Calculate the additive function value for each edge
 #'   feature in a Landscape Network (LSN)
-#' @param edges An `sf` object with LINESTING geometry created
+#' @param edges An `sf` object with LINESTRING geometry created
 #'   using \code{\link{lines_to_lsn}}.
 #' @param lsn_path Local pathname to a directory in character format
 #'   specifying where relationships.csv resides, which is created
