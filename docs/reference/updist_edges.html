@@ -20,7 +20,7 @@ the Landscape Network (LSN)"><!-- mathjax --><script src="https://cdnjs.cloudfla
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SSNbler</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
       </span>
     </div>
 
@@ -83,7 +83,7 @@ the Landscape Network (LSN)</p>
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>edges</dt>
-<dd><p>An <code>sf</code> object with LINESTING geometry created
+<dd><p>An <code>sf</code> object with LINESTRING geometry created
 using <code><a href="lines_to_lsn.html">lines_to_lsn</a></code>.</p></dd>
 
 
@@ -185,9 +185,9 @@ column contains.</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">edges</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1] "rid"        "COMID"      "GNIS_NAME"  "REACHCODE"  "FTYPE"     </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [6] "FCODE"      "AREAWTMAP"  "SLOPE"      "rcaAreaKm2" "h2oAreaKm2"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11] "Length"     "upDist"     "geometry"  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [11] "Length"     "upDist"     "geom"      </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">edges</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Length"</span>, <span class="st">"upDist"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Length            upDist                 geometry  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Length            upDist                   geom    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Min.   :  16.55   Min.   :  270.6   LINESTRING   :163  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  1st Qu.: 588.88   1st Qu.: 7719.2   epsg:5070    :  0  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Median :1374.09   Median :11270.8   +proj=aea ...:  0  </span>

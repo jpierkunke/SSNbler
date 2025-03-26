@@ -1,6 +1,6 @@
 Package: SSNbler
 Title: Assemble 'SSN' Objects
-Version: 1.0.1
+Version: 1.1.0
 Authors@R: c(
 	   person(given = "Erin",
     		 family = "Peterson",
@@ -42,7 +42,9 @@ Imports:
 	igraph,
 	RSQLite,
 	withr,
-	SSN2
+	SSN2,
+	doParallel,
+	foreach
 Suggests:
     ggplot2,
     knitr,

@@ -21,7 +21,7 @@ tables are created and topological relationships are checked."><!-- mathjax --><
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SSNbler</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
       </span>
     </div>
 
@@ -79,6 +79,8 @@ tables are created and topological relationships are checked.</p>
 <span>  topo_tolerance <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  remove_ZM <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  overwrite <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  use_parallel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  no_cores <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -86,7 +88,7 @@ tables are created and topological relationships are checked.</p>
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>streams</dt>
-<dd><p>An <code>sf</code> object with LINESTING geometry
+<dd><p>An <code>sf</code> object with LINESTRING geometry
 representing streams.</p></dd>
 
 
@@ -127,6 +129,14 @@ removed from streams, if they exist. Default is <code>FALSE</code>.</p></dd>
 overwrite existing files with the same names. If <code>FALSE</code> and
 files sharing the same names as the outputs exist in the
 <code>lsn_path</code>, the function will exit early with an error.</p></dd>
+
+
+<dt>use_parallel</dt>
+<dd><p>Logical. if <code>TRUE</code> parallel processing will be used. Default is <code>FALSE</code>.</p></dd>
+
+
+<dt>no_cores</dt>
+<dd><p>Integer representing the number of cores used when <code>use_parallel = TRUE</code>.</p></dd>
 
 
 <dt>verbose</dt>
@@ -188,7 +198,7 @@ are automatically snapped when <code>check_topology = TRUE</code>.  When
 (snap_tolerance/10000) &lt;= distance &lt;= snap_tolerance, the nodes are
 not snapped and are instead flagged as potential errors for the
 user to check and correct. Similarly, when snap_tolerance &lt; distance &lt;=
-topo_tolerance, nodes are flagged as potential errors.</p>
+topo_tolerance, nodes are flagged as potential errors. Note that <code>snap_tolerance</code> must always be &lt; the length of the shortest line feature found in <code>streams</code>. Use the <code><a href="https://r-spatial.github.io/sf/reference/geos_measures.html" class="external-link">st_length</a></code> to obtain and check the length of each line feature.</p>
     </div>
 
   </div>

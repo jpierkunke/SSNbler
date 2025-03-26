@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SSNbler</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
       </span>
     </div>
 
@@ -487,7 +487,7 @@ are used to produce a topologically corrected LSN containing edges,
 observed sites, and prediction sites (optional). This LSN provides the
 foundation for all of the remaining spatial data processing steps and
 the spatial statistical models. Creating the LSN is often the most
-time-consuming step in the spatial statistical modelling workflow,
+time-consuming step in the spatial statistical modeling workflow,
 especially if the edges or sites contain a large number of features or
 the stream network has many topological errors. However, it is critical
 that the spatial and topological relationships are accurately
@@ -549,7 +549,7 @@ functions.</caption>
 <td align="left">csv file</td>
 </tr>
 <tr class="even">
-<td align="left">noderelationship table</td>
+<td align="left">noderelationships table</td>
 <td align="left"></td>
 <td align="left">csv file</td>
 </tr>
@@ -612,7 +612,7 @@ edited.</li>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">edges</span><span class="op">)</span> <span class="co">## View edges column names</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;  [1] "rid"        "COMID"      "GNIS_NAME"  "REACHCODE"  "FTYPE"     </span></span>
 <span><span class="co">#&gt;  [6] "FCODE"      "AREAWTMAP"  "SLOPE"      "rcaAreaKm2" "h2oAreaKm2"</span></span>
-<span><span class="co">#&gt; [11] "Length"     "upDist"     "geometry"</span></span></code></pre>
+<span><span class="co">#&gt; [11] "Length"     "upDist"     "geom"</span></span></code></pre>
 <p>Two columns are added to edges and saved in <code>edges.gpkg</code>.
 <code>Length</code> represents the length of each edge in map units and
 <code>upDist</code> is the upstream distance for each edge.</p>
@@ -668,7 +668,7 @@ and <code>edges</code> GeoPackages reside. Must be specified if
 <pre><code><span><span class="co">#&gt;  [1] "rid"        "STREAMNAME" "COMID"      "AREAWTMAP"  "SLOPE"     </span></span>
 <span><span class="co">#&gt;  [6] "ELEV_DEM"   "Source"     "Summer_mn"  "MaxOver20"  "C16"       </span></span>
 <span><span class="co">#&gt; [11] "C20"        "C24"        "FlowCMS"    "AirMEANc"   "AirMWMTc"  </span></span>
-<span><span class="co">#&gt; [16] "rcaAreaKm2" "h2oAreaKm2" "ratio"      "snapdist"   "geometry"  </span></span>
+<span><span class="co">#&gt; [16] "rcaAreaKm2" "h2oAreaKm2" "ratio"      "snapdist"   "geom"      </span></span>
 <span><span class="co">#&gt; [21] "upDist"</span></span></code></pre>
 <p>The data stored in <code>upDist</code> are later used to calculate
 the directional hydrologic distances between observed and prediction
@@ -770,7 +770,7 @@ to create the segment PI values:</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">edges</span><span class="op">)</span> <span class="co">## Look at edges column names</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;  [1] "rid"        "COMID"      "GNIS_NAME"  "REACHCODE"  "FTYPE"     </span></span>
 <span><span class="co">#&gt;  [6] "FCODE"      "AREAWTMAP"  "SLOPE"      "rcaAreaKm2" "h2oAreaKm2"</span></span>
-<span><span class="co">#&gt; [11] "Length"     "upDist"     "areaPI"     "afvArea"    "geometry"</span></span></code></pre>
+<span><span class="co">#&gt; [11] "Length"     "upDist"     "areaPI"     "afvArea"    "geom"</span></span></code></pre>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">edges</span><span class="op">$</span><span class="va">afvArea</span><span class="op">)</span> <span class="co">## Summarize the AFV column</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
@@ -822,7 +822,7 @@ via <code><a href="../reference/lines_to_lsn.html">lines_to_lsn()</a></code> is 
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">site.list</span><span class="op">$</span><span class="va">pred1km</span><span class="op">)</span> <span class="co">## View column names in pred1km</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;  [1] "rid"        "COMID"      "AREAWTMAP"  "SLOPE"      "ELEV_DEM"  </span></span>
 <span><span class="co">#&gt;  [6] "FlowCMS"    "AirMEANc"   "AirMWMTc"   "rcaAreaKm2" "h2oAreaKm2"</span></span>
-<span><span class="co">#&gt; [11] "ratio"      "snapdist"   "upDist"     "afvArea"    "geometry"</span></span></code></pre>
+<span><span class="co">#&gt; [11] "ratio"      "snapdist"   "upDist"     "afvArea"    "geom"</span></span></code></pre>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">site.list</span><span class="op">$</span><span class="va">pred1km</span><span class="op">$</span><span class="va">afvArea</span><span class="op">)</span> <span class="co">## Summarize AFVs in pred1km and look for zeros</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
@@ -955,7 +955,7 @@ locations using the ‘SSN2’ function <code>ssn_simulate</code>.</p>
 <p>The <code>path</code> element provides a critical link between the
 <code>.ssn</code> directory and the <code>SSN</code> object stored in R.
 This is important because the ‘SSN2’ package reads and writes data to
-this directory during the spatial stream-network modelling workflow.</p>
+this directory during the spatial stream-network modeling workflow.</p>
 <p>The <code>ssn_assemble</code> function also adds several important
 columns to the edges, obs, and prediction datasets.</p>
 <ul>
@@ -1067,7 +1067,7 @@ manipulated, deleted, or replaced in the same way as other
 named list. In this example, the edges and observed sites are accessed
 using calls to <code>mf04_ssn$edges</code> and
 <code>mf04_ssn$obs</code>, respectively. The prediction sites are
-accessed a bit differently (e.g. <code>mf04_ssn$preds$pred1km</code>)
+accessed a bit differently (e.g.,<code>mf04_ssn$preds$pred1km</code>)
 because <code>preds</code> is itself a named list.</p>
 <p>Users often want to incorporate additional data into the edges,
 observations, or prediction datasets to generate AFVs, for use as model
@@ -1079,7 +1079,7 @@ relatively easy to join these and other data to the <code>sf</code>
 objects in <strong>R</strong> before or after the <code>SSN</code>
 object is assembled. An online search will show there are numerous
 functions available for joining an <code>sf</code> object to a variety
-of data formats (e.g. <code>data.frames</code>, <code>tibbles</code>,
+of data formats (e.g.,<code>data.frames</code>, <code>tibbles</code>,
 <code>vectors</code>, <code>sp</code> objects). However, if the result
 of the join is not an <code>sf</code> object, it must be converted to
 one before running additional functions in ‘SSNbler’ and ‘SSN2’ (see
