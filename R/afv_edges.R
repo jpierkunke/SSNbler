@@ -302,9 +302,9 @@ afv_edges <- function(edges, lsn_path, infl_col, segpi_col, afv_col,
   sum.afv.0 <- sum(st_drop_geometry(results_sf[, afv_col]) == 0)
   if (sum.afv.0 > 0) {
     warning(paste0(
-      "\n", infl_col, " contains ", sum.zeros, " zeros and ", afv_col,
+      "\n", infl_col, " contains ", sum.zeros, " zero(s) and ", afv_col,
       " contains ", sum.afv.0,
-      " zeros. If a large number of SITES (not edges) have AFV==0, it will impact the tail-up autocovariance function."
+      " zero(s). If a large number of SITES (not edges) have AFV==0, it will impact the tail-up autocovariance function."
     ))
   }
 

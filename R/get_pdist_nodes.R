@@ -1,7 +1,8 @@
 get_pdist_nodes<- function(other_xy,
 													 node_xy,
 													 ncores,
-													 snap_tolerance) {
+													 snap_tolerance,
+													 node_dir) {
 
   node.index<-NULL
 
@@ -39,7 +40,8 @@ get_pdist_nodes<- function(other_xy,
 
 														pdist_node_coords(node_coords = node_xy_list[[node.index]],
 																							other_xy = other_xy,
-																							snap_tolerance = snap_tolerance)
+																							snap_tolerance = snap_tolerance,
+																							node_dir = node_dir)
 													}
 
 	n_flow <- unlist(lapply(seq_along(out.list), function(i) {
@@ -49,6 +51,11 @@ get_pdist_nodes<- function(other_xy,
 	snap_check <- unlist(lapply(seq_along(out.list), function(i) {
 		if (names(out.list)[i] == "snap_check") out.list[[i]]
 	}))
+	
+	unsnapped_tonodes <- unlist(lapply(seq_along(out.list), function(i) {
+		if (names(out.list)[i] == "unsnapped_tonodes") out.list[[i]]
+	}))
 
-	return(list(n_flow = n_flow, snap_check = snap_check))
+	return(list(n_flow = n_flow, snap_check = snap_check, 
+							unsnapped_tonodes = unsnapped_tonodes))
 }

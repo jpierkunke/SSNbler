@@ -79,12 +79,8 @@
 #' idea to set the \code{snap_tolerance} to a relatively small value
 #' compared to the \code{topo_tolerance} argument. Nodes separated by
 #' a Euclidean distance <= \code{snap_tolerance} are assumed to be
-#' connected.  If this distance <= (snap_tolerance/10000), the nodes
-#' are automatically snapped when \code{check_topology = TRUE}.  When
-#' (snap_tolerance/10000) <= distance <= snap_tolerance, the nodes are
-#' not snapped and are instead flagged as potential errors for the
-#' user to check and correct. Similarly, when snap_tolerance < distance <=
-#' topo_tolerance, nodes are flagged as potential errors. Note that \code{snap_tolerance} must always be < the length of the shortest line feature found in \code{streams}. Use the \code{\link[sf]{st_length}} to obtain and check the length of each line feature. 
+#' connected.  If this distance <= snap_tolerance, the nodes
+#' are automatically snapped when \code{check_topology = TRUE}. Similarly, when snap_tolerance < distance <= topo_tolerance, nodes are flagged as potential errors. Note that \code{snap_tolerance} must always be < the length of the shortest line feature found in \code{streams}. Use the \code{\link[sf]{st_length}} to obtain and check the length of each line feature. 
 #'
 #' @return An `sf` object representing edges in the LSN. The LSN, including edges.gpkg, nodes.gpkg, nodexy.csv, noderelationships.csv, and relationships.csv files, are saved locally to a directory defined by \code{lsn_path}. If \code{check_topology = TRUE} and topological errors are identified, then node_errors.gpkg is also saved to \code{lsn_path}.
 #'
@@ -100,7 +96,14 @@ lines_to_lsn <- function(streams,
 												 use_parallel = FALSE,
 												 no_cores = NULL,
                          verbose = TRUE) {
-  # check sf object
+  
+	
+	##@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@##
+	## Check Inputs ----
+	##@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@##
+	
+	
+	# check sf object
   if (!inherits(streams, "sf")) {
     stop("streams must be an sf object.", call. = FALSE)
   }
@@ -136,10 +139,6 @@ lines_to_lsn <- function(streams,
   }
 
   ## ## Make sure geometry column is named geometry rather than geom
-  ## if(!"geometry" %in% colnames(in_edges)) {
-  ##   ##in_edges <- st_geometry(in_edges, rename = "geometry")
-  ##   sf::st_geometry(in_edges)<- "geometry"
-  ## }
   edge.geom.name <- attributes(in_edges)$sf_column
 
   if (grepl("M", edge_geom) == TRUE & remove_ZM == FALSE) {
@@ -148,13 +147,11 @@ lines_to_lsn <- function(streams,
 
   ## Remove ZM dimensions if they exist
   if (grepl("M", edge_geom) == TRUE & remove_ZM == TRUE) {
-    ## if(str_detect(edge_geom, "M") == TRUE & remove_ZM == TRUE) {
     in_edges <- st_zm(in_edges)
   }
 
   ## if output directory doesn't exist, print warning and create it now
   if (!file.exists(lsn_path)) {
-    ## message("\nOutput directory does not exist. Trying to create ", lsn_path,"\n\n")
     dir.create(lsn_path)
   }
 
@@ -176,8 +173,7 @@ lines_to_lsn <- function(streams,
   if (inherits(in_edges, "sf")) n_edges <- nrow(in_edges)
   if (inherits(in_edges, "sfc")) n_edges <- length(in_edges)
 
-  # check bad column names
-  ## If rid file exists and overwrite is TRUE
+  # check column names
   if ("rid" %in% colnames(in_edges)) {
     if (overwrite) {
       in_edges$rid <- NULL
@@ -208,8 +204,13 @@ lines_to_lsn <- function(streams,
   }
   check_names_case(names(in_edges), "fid", "streams")
 
-  ## Add the field 'rid' (meaning reach identifier) and use it in all scripts as the rid / edgeid
+  ## Add the field rid 
   in_edges$rid <- seq.int(from = 1, to = n_edges) ## add and populate 1-based index rid column to edges
+  
+  
+  ##@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@##
+  ## Build edge relationships ----
+  ##@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@##
 
   ## Write edges to GeoPackage
   if (overwrite == FALSE & file.exists(paste0(lsn_path, "/edges.gpkg"))) {
@@ -228,7 +229,6 @@ lines_to_lsn <- function(streams,
   colnames(nodexy_mat) <- c("pointid", "xcoord", "ycoord")
 
   ## Create empty noderelationships matrix to be filled with rid, fromnode and tonode pointid.
-  ## cat("\n    Creating Relationship Tables....\n")
   node_relate <- matrix(data = NA, nrow = 3 * n_edges, ncol = 3, byrow = TRUE)
   colnames(node_relate) <- c("rid", "fromnode", "tonode")
 
@@ -256,8 +256,14 @@ lines_to_lsn <- function(streams,
   nodexy_mat <- as.data.frame(cbind(pid, nodexy_mat))
   colnames(nodexy_mat) <- c("pointid", "xcoord", "ycoord")
 
-  ## Remove points with very very close coordinates
-  ndec <- get_decimals(snap_tolerance / 1e4)
+  ## Remove nodes within snap_tolerance of one another
+  #ndec <- get_decimals(snap_tolerance / 1e4)
+  if(snap_tolerance < 1) {
+  	ndec <- get_decimals(snap_tolerance) - 1
+  } else {
+  	ndec <- 0
+  }
+
   tmp <- as.data.frame(apply(nodexy_mat[, 2:3], 2, round, ndec))
   tmp <- data.frame(cbind(pointid = nodexy_mat$pointid, tmp))
   ind.dup <- duplicated(tmp[, 2:3])
@@ -294,7 +300,6 @@ lines_to_lsn <- function(streams,
   node_coords <- node_coords[!ind.dup, ]
 
   ## Finish creating the sf object for all edge endpoints
-  ###
   nodexy_sf <- st_as_sf(as.data.frame(nodexy_mat[!ind.dup, ]),
     coords = c("xcoord", "ycoord"),
     crs = lst_crs,
@@ -302,7 +307,6 @@ lines_to_lsn <- function(streams,
   )
   
   ## First and last point of each last segment, stored as an SF object
-  ## from_point <- st_line_sample(st_transform(in_edges, epsg), sample = 0)
   from_point <- st_line_sample(in_edges, sample = 0)
   to_point <- st_line_sample(in_edges, sample = 1)
   from_xy <- do.call(rbind, lapply(from_point, function(x) x[1:2]))
@@ -346,10 +350,13 @@ lines_to_lsn <- function(streams,
   ## Returns a vector of TRUE/FALSE
   outlets <- unlist(lapply(rid_confl, function(x) length(x) == 0)) ## logical vector
   
-  ##############################################################
+  ##@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@##
+  ## Check topology ----
+  ##@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@##
 
   ## Check topology at this step, if it's been asked for
     if (check_topology) {
+
     	## Print message
     	if (verbose == TRUE) message("Checking network topology\n")
 	
@@ -376,6 +383,10 @@ lines_to_lsn <- function(streams,
     		snap_check_2 <- apply(nodes_vs_from, 1, function(x) {
     			sum(x > 0 & x <= snap_tolerance)
     		})
+
+    		dbl_tonodes <- which(colSums(nodes_vs_to == 0) > 1)
+    		unsnapped_tonodes <- which(rowSums(nodes_vs_to[, dbl_tonodes,
+    																									 drop = FALSE] == 0) > 0)
     		
     	} else {
 
@@ -384,25 +395,30 @@ lines_to_lsn <- function(streams,
     		in.list<- get_pdist_nodes(node_xy = node_coords, 
     															other_xy = to_xy, 
     															ncores = no_cores, 
-    															snap_tolerance = snap_tolerance)
+    															snap_tolerance = snap_tolerance,
+    															node_dir = "to")
 
     		n_inflow <- in.list[[1]]
     		snap_check_1 <- in.list[[2]]
+    		unsnapped_tonodes <- in.list[[3]]
     		
     		rm(in.list)
     		
     		out.list<- get_pdist_nodes(node_xy = node_coords, 
     															other_xy = from_xy, 
     															ncores = no_cores, 
-    															snap_tolerance = snap_tolerance)
+    															snap_tolerance = snap_tolerance,
+    															node_dir = "from")
     		n_outflow <- out.list[[1]]
     		snap_check_2 <- out.list[[2]]
-    		
-    		rm(out.list)
     		
     	}
 
     unsnapped_connection <- (snap_check_1 + snap_check_2) > 0
+    
+    if(length(unsnapped_tonodes) > 0) {
+    	unsnapped_connection[unsnapped_tonodes]<- TRUE
+    }
 
     ## Categorise nodes based on the number of inflow/outflow edges
     ## Returns a vector with T/F length = nrow(node_coords)
@@ -567,6 +583,11 @@ lines_to_lsn <- function(streams,
   ## but merge keeps both so that the result has more rows than
   ## nrow(to_from_coords[last_indices,]
   from_pointids <- as.data.frame(to_from_coords[first_indices, c("X", "Y")])
+  
+  # nodexy_mat1 <- nodexy_mat
+  # colnames(nodexy_mat1)[2:3]<- c("X", "Y")
+  # from_pointids1 <- merge(from_pointids, nodexy_mat1, by = c("X", "Y"), all = TRUE)
+  
   from_pointids <- left_join(from_pointids, nodexy_mat, by = c("X" = "xcoord", "Y" = "ycoord"))
   from_pointids <- from_pointids$pointid
 
