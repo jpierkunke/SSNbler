@@ -1,0 +1,11 @@
+test_that("updist_edges", {
+	expect_equal(dim(edges_updist), c(163, 13))
+	expect_true("Length" %in% names(edges_updist))
+	expect_equal(edges_updist$Length[1:2], c(3208.97, 898.94), tolerance = 0.01)
+	expect_true(all(edges_updist$Length >= 0))
+	expect_true("upDist" %in% names(edges_updist))
+	expect_equal(edges_updist$upDist[1:2], c(17458.27, 18357.20), tolerance = 0.01)
+	expect_true(all(edges_updist$upDist >= 0))
+	expect_true(all(edges_updist$upDist >= edges_updist$Length))
+	expect_s3_class(edges_updist, "sf")
+})

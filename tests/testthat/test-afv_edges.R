@@ -1,0 +1,13 @@
+test_that("afv_edges", {
+	expect_equal(dim(edges_afv), c(163, 15))
+	expect_true("areaPI" %in% names(edges_afv))
+	expect_equal(edges_afv$areaPI[1:2], c(0.426, 1.000), tolerance = 0.001)
+	expect_true(all(edges_afv$areaPI >= 0))
+	expect_true(all(edges_afv$areaPI <= 1))
+	expect_true("afvArea" %in% names(edges_afv))
+	expect_equal(edges_afv$afvArea[1:2], c(0.171, 0.171), tolerance = 0.001)
+	expect_true(all(edges_afv$afvArea >= 0))
+	expect_true(all(edges_afv$afvArea <= 1))
+	expect_true(all(edges_afv$areaPI >= edges_afv$afvArea))
+	expect_s3_class(edges_afv, "sf")
+})
