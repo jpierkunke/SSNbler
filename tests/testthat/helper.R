@@ -38,7 +38,7 @@ edges_lsn <- lines_to_lsn(
 
 obs_lsn <- sites_to_lsn(
 	sites = MF_obs,
-	edges = edges,
+	edges = edges_lsn,
 	save_local = TRUE,
 	lsn_path = path,
 	file_name = "obs.gpkg",
@@ -49,7 +49,7 @@ obs_lsn <- sites_to_lsn(
 
 preds_lsn <- sites_to_lsn(
 	sites = MF_pred1km,
-	edges = edges,
+	edges = edges_lsn,
 	save_local = TRUE,
 	lsn_path = path,
 	file_name = "pred1km.gpkg",
@@ -63,7 +63,7 @@ preds_lsn <- sites_to_lsn(
 ################################
 
 edges_updist <- updist_edges(
-	edges = edges,
+	edges = edges_lsn,
 	lsn_path = path,
 	calc_length = TRUE,
 	overwrite = TRUE,
@@ -122,3 +122,15 @@ ssn_object <- ssn_assemble(
 	overwrite = TRUE,
 	check = FALSE
 )
+
+################################
+#### read in output data ####
+################################
+
+edges <- sf::read_sf(paste0(path, "/edges.gpkg"))
+nodes <- sf::read_sf(paste0(path, "/nodes.gpkg"))
+obs <- sf::read_sf(paste0(path, "/obs.gpkg"))
+pred1km <- sf::read_sf(paste0(path, "/pred1km.gpkg"))
+noderelationships <- read.csv(paste0(path, "/noderelationships.csv"))
+nodexy <- read.csv(paste0(path, "/nodexy.csv"))
+relationships <- read.csv(paste0(path, "/relationships.csv"))
