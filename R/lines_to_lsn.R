@@ -413,7 +413,7 @@ lines_to_lsn <- function(streams,
     		snap_check_2 <- out.list[[2]]
     		
     	}
-
+		
     unsnapped_connection <- (snap_check_1 + snap_check_2) > 0
     
     if(length(unsnapped_tonodes) > 0) {
@@ -535,7 +535,13 @@ lines_to_lsn <- function(streams,
 
     ## Add to errors table
     suppressWarnings(errors <- rbind(errors, ill_int, dangle))
-
+    
+    ## Remove errors for flow unconnected end nodes w/in 
+    ## snap_tolerance that were previously snapped
+    ind <- (errors$pointid %in% removed_nodes$new.pointid) & 
+    	(errors$error == "Unsnapped Node")
+    errors <- errors[!ind,]
+    
     ## Writing node_errors
     if (overwrite == FALSE & file.exists(paste0(lsn_path, "/node_errors.gpkg"))) {
       stop(paste0(lsn_path, "/node_errors.gpkg"), " exists and overwrite == FALSE")
