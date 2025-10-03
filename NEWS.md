@@ -3,6 +3,7 @@
 ## Minor updates
 
 * Updated unit testing infrastructure.
+* Updates to Topology Editing and Delineating RCA tutorials.
 
 ## Bug fixes
 
