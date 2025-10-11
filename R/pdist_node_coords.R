@@ -1,7 +1,8 @@
 
 pdist_node_coords <- function(node_coords, other_xy, 
-															snap_tolerance = NULL) {
-
+															snap_tolerance = NULL,
+															node_dir) {
+  
 	node_dist <- pdist(node_coords, other_xy)
 	
 	dist_matrix <- as.matrix(node_dist)
@@ -13,7 +14,16 @@ pdist_node_coords <- function(node_coords, other_xy,
 	snap_check <- apply(dist_matrix, 1, function(x) {
 		sum(x > 0 & x <= snap_tolerance)
 	})
-
-	return(out.list = list(n_flow = n_flow, snap_check = snap_check))
+	
+	if(node_dir == "to") {
+		dbl_tonodes <- which(colSums(dist_matrix == 0) > 1)
+		unsnapped_tonodes <- which(rowSums(dist_matrix[, dbl_tonodes,
+																								 drop = FALSE] == 0) > 0)
+		return(out.list = list(n_flow = n_flow, snap_check = snap_check,
+													 unsnapped_tonodes = unsnapped_tonodes))
+	} else {
+	
+		return(out.list = list(n_flow = n_flow, snap_check = snap_check))
+	}
 	
 }

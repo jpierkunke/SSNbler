@@ -113,10 +113,6 @@ both provided in map units and must be >= 0. It is generally a good
 idea to set the \code{snap_tolerance} to a relatively small value
 compared to the \code{topo_tolerance} argument. Nodes separated by
 a Euclidean distance <= \code{snap_tolerance} are assumed to be
-connected.  If this distance <= (snap_tolerance/10000), the nodes
-are automatically snapped when \code{check_topology = TRUE}.  When
-(snap_tolerance/10000) <= distance <= snap_tolerance, the nodes are
-not snapped and are instead flagged as potential errors for the
-user to check and correct. Similarly, when snap_tolerance < distance <=
-topo_tolerance, nodes are flagged as potential errors. Note that \code{snap_tolerance} must always be < the length of the shortest line feature found in \code{streams}. Use the \code{\link[sf]{st_length}} to obtain and check the length of each line feature.
+connected.  If this distance <= snap_tolerance, the nodes
+are automatically snapped when \code{check_topology = TRUE}. Similarly, when snap_tolerance < distance <= topo_tolerance, nodes are flagged as potential errors. Note that \code{snap_tolerance} must always be < the length of the shortest line feature found in \code{streams}. Use the \code{\link[sf]{st_length}} to obtain and check the length of each line feature.
 }

@@ -1,3 +1,14 @@
+# SSNbler 1.1.1
+
+## Minor updates
+
+* Updated unit testing infrastructure.
+* Updates to Topology Editing and Delineating RCA tutorials.
+
+## Bug fixes
+
+* Fixed bug in `lines_to_lsn`, which prevented tonodes from snapping when the distance between them was snap_tolerance/1e4 < distance < snap_tolerance. Now, nodes are snapped if the distance between them is < snap_tolerance.
+
 # SSNbler 1.1.0
 
 ## Major updates
