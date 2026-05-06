@@ -524,9 +524,19 @@ lines_to_lsn <- function(streams,
         colnames(dangle_xy) <- c("xcoord", "ycoord")
         dangle_xy$ord <- seq(1, nrow(dangle_xy), by = 1)
         removed_nodes$removed <- 1
-        tmp <- merge(dangle_xy, removed_nodes[, c("xcoord", "ycoord", "removed")],
+        # JPK added rounding to 8 decimal places to address erroneous topo error
+        # - topological error occurs on cluster but not on laptop, even with
+        #   the same code and the same input stream data
+        # - the x coordinate of just one point differs by 1e-10 between
+        #   dangle_xy and removed_nodes; seems to be a numerical precision issue
+        dangle_rounded = dangle_xy |>
+        	dplyr::mutate(xcoord = round(xcoord, 8), ycoord = round(ycoord, 8))
+        removed_rounded = removed_nodes |> 
+        	dplyr::mutate(xcoord = round(xcoord, 8), ycoord = round(ycoord, 8))
+        tmp <- merge(dangle_rounded, removed_rounded[, c("xcoord", "ycoord", "removed")],
           by = c("xcoord", "ycoord"), all.x = TRUE
         )
+        # end of JPK edit
         tmp <- tmp[order(tmp$ord), ]
         ind <- tmp$removed == 1 & !is.na(tmp$removed)
         dangle <- dangle[!ind, ]
